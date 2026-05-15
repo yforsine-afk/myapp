@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: myapp-run
+spec:
+  serviceAccountName: pipeline-sa
+
+  pipelineRef:
+    name: myapp-pipeline
+
+  params:
+  - name: GIT_URL
+    value: https://github.com/YOURUSER/YOUR-REPO.git
+
+  - name: IMAGE
+    value: quay.io/phatthananvst01/quaytekton:v1
+
+  workspaces:
+  - name: shared-workspace
+    persistentVolumeClaim:
+      claimName: source-pvc

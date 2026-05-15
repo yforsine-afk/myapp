@@ -1,0 +1,40 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: myapp-pipeline
+spec:
+  params:
+  - name: GIT_URL
+    type: string
+  - name: IMAGE
+    type: string
+
+  workspaces:
+  - name: shared-workspace
+
+  tasks:
+
+  # ✅ 1. clone source
+  - name: clone
+    taskRef:
+      name: git-clone
+    params:
+    - name: url
+      value: $(params.GIT_URL)
+    - name: deleteExisting
+      value: "true"
+    workspaces:
+    - name: output
+      workspace: shared-workspace
+
+  # ✅ 2. build + push
+  - name: build
+    runAfter: ["clone"]
+    taskRef:
+      name: build-nginx   # เราจะใช้ Task เดิม (kaniko)
+    params:
+    - name: IMAGE
+      value: $(params.IMAGE)
+    workspaces:
+    - name: source
+      workspace: shared-workspace
